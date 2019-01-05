@@ -1,0 +1,14 @@
+{
+  "name": "hexgrid",
+  "description": "TypeScript library for hexagonal grids.",
+  "version": "1.0.0",
+  "license": "MIT",
+  "repository": {},
+  "devDependencies": {
+    "typescript": "3.2.2"
+  },
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "tsc"
+  }
+}
