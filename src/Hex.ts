@@ -15,7 +15,7 @@ export class Hex {
   public static readonly NegR     = new Hex( 0, -1);
   public static readonly NegQPosR = new Hex(-1,  1);
 
-  public static Directions: ReadonlyArray<Hex> = [
+  public static readonly Directions: ReadonlyArray<Hex> = [
     Hex.PosQ,
     Hex.PosR,
     Hex.PosQNegR,
