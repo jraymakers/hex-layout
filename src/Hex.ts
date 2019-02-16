@@ -2,6 +2,11 @@ export type AnyHex = Hex | MutableHex;
 
 export class Hex {
 
+  public static fromId(hexId: string): Hex {
+    const parts = hexId.split('_');
+    return new Hex(parseInt(parts[0], 10), parseInt(parts[1], 10));
+  }
+
   public static readonly Origin   = new Hex( 0,  0);
   public static readonly PosQ     = new Hex( 1,  0);
   public static readonly PosR     = new Hex( 0,  1);

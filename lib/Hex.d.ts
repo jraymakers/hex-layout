@@ -1,5 +1,6 @@
 export declare type AnyHex = Hex | MutableHex;
 export declare class Hex {
+    static fromId(hexId: string): Hex;
     static readonly Origin: Hex;
     static readonly PosQ: Hex;
     static readonly PosR: Hex;
