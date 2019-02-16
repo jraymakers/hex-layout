@@ -8,6 +8,7 @@ export declare class Hex {
     static readonly NegQ: Hex;
     static readonly NegR: Hex;
     static readonly NegQPosR: Hex;
+    static Directions: ReadonlyArray<Hex>;
     readonly q: number;
     readonly r: number;
     readonly s: number;
