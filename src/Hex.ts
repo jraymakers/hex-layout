@@ -2,12 +2,8 @@ export type AnyHex = Hex | MutableHex;
 
 export class Hex {
 
-  public static fromId(hexId: string): Hex {
-    const parts = hexId.split('_');
-    return new Hex(parseInt(parts[0], 10), parseInt(parts[1], 10));
-  }
-
   public static readonly Origin   = new Hex( 0,  0);
+
   public static readonly PosQ     = new Hex( 1,  0);
   public static readonly PosR     = new Hex( 0,  1);
   public static readonly PosQNegR = new Hex( 1, -1);
@@ -24,6 +20,19 @@ export class Hex {
     Hex.NegQPosR,
   ];
 
+  public static fromKey(hexKey: string): Hex {
+    const parts = hexKey.split('_');
+    return new Hex(parseInt(parts[0], 10), parseInt(parts[1], 10));
+  }
+
+  public static create(q: number, r: number, s?: number): Hex {
+    return new Hex(q, r, s);
+  }
+
+  public static mutable(q: number, r: number, s?: number): MutableHex {
+    return new MutableHex(q, r, s);
+  }
+
   public readonly q: number;
   public readonly r: number;
   public readonly s: number;
@@ -34,11 +43,11 @@ export class Hex {
     this.s = s == undefined ? -q-r : s;
   }
 
-  public id(): string {
+  public key(): string {
     return `${this.q}_${this.r}`;
   }
 
-  public equals(h: Hex): boolean {
+  public equals(h: AnyHex): boolean {
     return this.q === h.q && this.r === h.r && this.s === h.s;
   }
 
@@ -46,19 +55,15 @@ export class Hex {
     return (Math.abs(this.q) + Math.abs(this.r) + Math.abs(this.s)) / 2;
   }
 
-  public distanceTo(h: Hex): number {
+  public distanceTo(h: AnyHex): number {
     return (Math.abs(h.q - this.q) + Math.abs(h.r - this.r) + Math.abs(h.s - this.s)) / 2;
   }
 
-  public clone(): Hex {
-    return new Hex(this.q, this.r, this.s);
-  }
-
-  public plus(h: Hex): Hex {
+  public plus(h: AnyHex): Hex {
     return new Hex(this.q + h.q, this.r + h.r, this.s + h.s);
   }
 
-  public minus(h: Hex): Hex {
+  public minus(h: AnyHex): Hex {
     return new Hex(this.q - h.q, this.r - h.r, this.s - h.s);
   }
 
@@ -84,14 +89,14 @@ export class MutableHex {
     this.s = s == undefined ? -q-r : s;
   }
 
-  public add(h: Hex): MutableHex {
+  public add(h: AnyHex): MutableHex {
     this.q += h.q;
     this.r += h.r;
     this.s += h.s;
     return this;
   }
 
-  public sub(h: Hex): MutableHex {
+  public sub(h: AnyHex): MutableHex {
     this.q -= h.q;
     this.r -= h.r;
     this.s -= h.s;

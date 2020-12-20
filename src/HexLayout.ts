@@ -1,175 +1,124 @@
-import {
-  Hex,
-  MutableHex,
-} from './Hex';
+import { Bounds } from './Bounds';
+import { Hex } from './Hex';
+import { Matrix } from './Matrix';
+import { Vector } from './Vector';
 
-import {
-  boundsVec2,
-  BoundsVec2,
-  Vec2,
-} from './Vec2';
+const rotation_PI_3 = Matrix.rotationTransform(Math.PI/3);
 
-const sqrt3 = Math.sqrt(3);
-const sqrt3_2 = sqrt3 / 2;
-
-/*  __
- * / _\
- * \__/
- */
-export namespace XAlignedHex {
-  export const PosX     = new Vec2( 1  ,        0);
-  export const PosXPosY = new Vec2( 0.5,  sqrt3_2);
-  export const NegXPosY = new Vec2(-0.5,  sqrt3_2);
-  export const NegX     = new Vec2(-1  ,        0);
-  export const NegXNegY = new Vec2(-0.5, -sqrt3_2);
-  export const PosXNegY = new Vec2( 0.5, -sqrt3_2);
+export enum Axis {
+  X,
+  Y,
 }
-
-/*   >.<
- * |     |
- * |  |  |
- *   >.<
- */
-export namespace YAlignedHex {
-  export const PosXPosY = new Vec2( sqrt3_2,  0.5);
-  export const     PosY = new Vec2(       0,  1  );
-  export const NegXPosY = new Vec2(-sqrt3_2,  0.5);
-  export const NegXNegY = new Vec2(-sqrt3_2, -0.5);
-  export const     NegY = new Vec2(       0, -1  );
-  export const PosXNegY = new Vec2( sqrt3_2, -0.5);
-}
-
-export enum Corner {
-  PosQPosR,
-  NegQPos2R,
-  Neg2QPosR,
-  NegQNegR,
-  PosQNeg2R,
-  Pos2QNegR,
-};
-
-export enum EdgeCenter {
-  PosQ,
-  PosR,
-  NegQPosR,
-  NegQ,
-  NegR,
-  PosQNegR,
-};
 
 export interface HexLayoutSettings {
-  readonly origin: Vec2; // location of 0,0 hex
-  readonly qBasis: Vec2; // direction of first (q) hex coordinate
-  readonly rBasis: Vec2; // direction of second (r) hex coordinate
-  readonly scale: Vec2; // distance between hex centers
+
+  /** Distance from the center of a hex to an edge center */
+  readonly innerRadius: number;
+
+  /** Location of the 0,0 hex */
+  readonly origin: Vector;
+
+  /** Whether the q axis is aligned with the x or y axis */
+  readonly qAxis: Axis;
+
 }
 
 export class HexLayout {
 
-  public readonly origin: Vec2;
-  public readonly qBasis: Vec2;
-  public readonly rBasis: Vec2;
-  public readonly scale: Vec2;
-
-  public readonly qInverse: Vec2;
-  public readonly rInverse: Vec2;
+  public readonly innerRadius: number;
+  public readonly origin: Vector;
+  public readonly qAxis: Axis;
   
-  public readonly cornerVecs: ReadonlyArray<Vec2>;
-  public readonly edgeCenterVecs: ReadonlyArray<Vec2>;
+  public readonly hexToPointTransform: Matrix;
+  public readonly pointToHexTransform: Matrix;
+  
+  public readonly cornerVectors: ReadonlyArray<Vector>;
+  public readonly edgeCenterVectors: ReadonlyArray<Vector>;
 
   constructor(settings: HexLayoutSettings) {
+    this.innerRadius = settings.innerRadius;
     this.origin = settings.origin;
-    this.qBasis = settings.qBasis;
-    this.rBasis = settings.rBasis;
-    this.scale = settings.scale;
+    this.qAxis = settings.qAxis;
 
-    const det = this.qBasis.x * this.rBasis.y - this.qBasis.y * this.rBasis.x;
-    if (det === 0) {
-      throw new Error('Invalid basis vectors!  Matrix has no determinant.');
-    }
-    const detInv = 1 / det;
+    this.hexToPointTransform =
+      this.qAxis === Axis.X
+        ? Matrix.stretchTransform(1, Math.sqrt(3)/2).timesMatrix(Matrix.horizonalShearTransform(0.5))
+        : Matrix.stretchTransform(Math.sqrt(3)/2, 1).timesMatrix(Matrix.verticalShearTransform(0.5))
+        ;
+    this.pointToHexTransform = this.hexToPointTransform.inverse();
 
-    this.qInverse = new Vec2(this.rBasis.y * detInv, -this.rBasis.x * detInv);
-    this.rInverse = new Vec2(-this.qBasis.y * detInv, this.qBasis.x * detInv);
+    const qVector = this.qAxis === Axis.X ? Vector.X : Vector.Y;
+    const rAxisDirection = this.qAxis === Axis.X ? 1 : -1;
 
-    const posQPosRCornerVec =
-      this.qBasis.mutableCopy().add(this.rBasis).scale(1/3).scaleBy(this.scale).frozenCopy();
-    const negQPos2RCornerVec =
-      this.rBasis.mutableCopy().scale(2).sub(this.qBasis).scale(1/3).scaleBy(this.scale).frozenCopy();
-    const neg2QPosRCornerVec =
-      this.qBasis.mutableCopy().scale(-2).add(this.rBasis).scale(1/3).scaleBy(this.scale).frozenCopy();
-    const negQNegRCornerVec = posQPosRCornerVec.times(-1);
-    const posQNeg2RCornerVec = negQPos2RCornerVec.times(-1);
-    const pos2QNegRCornerVec = neg2QPosRCornerVec.times(-1);
+    const cornerVector0 = Matrix.rotationTransform(rAxisDirection * Math.PI/6)
+      .timesVector(qVector).times(this.innerRadius * 2 / Math.sqrt(3));
+    const cornerVector1 = rotation_PI_3.timesVector(cornerVector0);
+    const cornerVector2 = rotation_PI_3.timesVector(cornerVector1);
+    const cornerVector3 = rotation_PI_3.timesVector(cornerVector2);
+    const cornerVector4 = rotation_PI_3.timesVector(cornerVector3);
+    const cornerVector5 = rotation_PI_3.timesVector(cornerVector4);
 
-    this.cornerVecs = [
-      posQPosRCornerVec,
-      negQPos2RCornerVec,
-      neg2QPosRCornerVec,
-      negQNegRCornerVec,
-      posQNeg2RCornerVec,
-      pos2QNegRCornerVec,
+    this.cornerVectors = [
+      cornerVector0,
+      cornerVector1,
+      cornerVector2,
+      cornerVector3,
+      cornerVector4,
+      cornerVector5,
     ];
 
-    const posQEdgeCenterVec =
-      this.qBasis.mutableCopy().scale(1/2).scaleBy(this.scale).frozenCopy();
-    const posREdgeCenterVec =
-      this.rBasis.mutableCopy().scale(1/2).scaleBy(this.scale).frozenCopy();
-    const negQPosREdgeCenterVec =
-      this.rBasis.mutableCopy().sub(this.qBasis).scale(1/2).scaleBy(this.scale).frozenCopy();
-    const negQEdgeCenterVec = posQEdgeCenterVec.times(-1);
-    const negREdgeCenterVec = posREdgeCenterVec.times(-1);
-    const posQNegREdgeCenterVec = negQPosREdgeCenterVec.times(-1);
+    const edgeCenterVector0 = qVector.times(this.innerRadius);
+    const edgeCenterVector1 = rotation_PI_3.timesVector(edgeCenterVector0);
+    const edgeCenterVector2 = rotation_PI_3.timesVector(edgeCenterVector1);
+    const edgeCenterVector3 = rotation_PI_3.timesVector(edgeCenterVector2);
+    const edgeCenterVector4 = rotation_PI_3.timesVector(edgeCenterVector3);
+    const edgeCenterVector5 = rotation_PI_3.timesVector(edgeCenterVector4);
 
-    this.edgeCenterVecs = [
-      posQEdgeCenterVec,
-      posREdgeCenterVec,
-      negQPosREdgeCenterVec,
-      negQEdgeCenterVec,
-      negREdgeCenterVec,
-      posQNegREdgeCenterVec,
+    this.edgeCenterVectors = [
+      edgeCenterVector0,
+      edgeCenterVector1,
+      edgeCenterVector2,
+      edgeCenterVector3,
+      edgeCenterVector4,
+      edgeCenterVector5,
     ];
   }
 
-  public cornerVec(corner: Corner): Vec2 {
-    return this.cornerVecs[corner];
+  public cornerVector(corner: 0 | 1 | 2 | 3 | 4 | 5): Vector {
+    return this.cornerVectors[corner];
   }
 
-  public edgeCenterVec(edgeCenter: EdgeCenter): Vec2 {
-    return this.edgeCenterVecs[edgeCenter];
+  public edgeCenterVector(edgeCenter: 0 | 1 | 2 | 3 | 4 | 5): Vector {
+    return this.edgeCenterVectors[edgeCenter];
   }
 
-  public centerOfHex(h: Hex): Vec2 {
-    return new Vec2(
-      this.origin.x + this.scale.x * (this.qBasis.x * h.q + this.rBasis.x * h.r),
-      this.origin.y + this.scale.y * (this.qBasis.y * h.q + this.rBasis.y * h.r),
-    );
+  public centerOfHex(h: Hex): Vector {
+    const hexVector = new Vector(h.q, h.r);
+    const notTransformedOrScaled = this.hexToPointTransform.timesVector(hexVector);
+    return notTransformedOrScaled.times(this.innerRadius * 2).plus(this.origin);
   }
 
-  public hexFromPoint(v: Vec2): Hex {
-    const x = (v.x - this.origin.x) / this.scale.x;
-    const y = (v.y - this.origin.y) / this.scale.y;
-    return new MutableHex(
-      x * this.qInverse.x + y * this.qInverse.y,
-      x * this.rInverse.x + y * this.rInverse.y,
-    ).round().frozenCopy();
+  public hexFromPoint(v: Vector): Hex {
+    const transformedAndScaled = v.minus(this.origin).times(1 / (this.innerRadius * 2));
+    const fractionalHexVector = this.pointToHexTransform.timesVector(transformedAndScaled);
+    return Hex.mutable(fractionalHexVector.x, fractionalHexVector.y).round().frozenCopy();
   }
 
-  public cornersFromCenter(center: Vec2): ReadonlyArray<Vec2> {
-    return this.cornerVecs.map((v) => center.plus(v));
+  public cornersFromCenter(center: Vector): ReadonlyArray<Vector> {
+    return this.cornerVectors.map((v) => center.plus(v));
   }
 
-  public cornersOfHex(h: Hex): ReadonlyArray<Vec2> {
+  public cornersOfHex(h: Hex): ReadonlyArray<Vector> {
     const center = this.centerOfHex(h);
     return this.cornersFromCenter(center);
   }
 
-  public bounds(hexes: ReadonlyArray<Hex>): BoundsVec2 {
-    let allCorners: Vec2[] = [];
+  public bounds(hexes: ReadonlyArray<Hex>): Bounds {
+    let allCorners: Vector[] = [];
     for (const hex of hexes) {
       allCorners = allCorners.concat(this.cornersOfHex(hex));
     }
-    return boundsVec2(allCorners);
+    return Bounds.fromVectors(allCorners);
   }
 
 }

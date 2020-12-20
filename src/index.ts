@@ -1,16 +1,18 @@
 export {
+  Bounds,
+} from './Bounds';
+
+export {
   Hex,
   MutableHex,
 } from './Hex';
 
 export {
-  Corner,
-  EdgeCenter,
+  Axis,
   HexLayout,
-  XAlignedHex,
-  YAlignedHex,
 } from './HexLayout';
 
 export {
-  Vec2,
-} from './Vec2';
+  Vector,
+  MutableVector,
+} from './Vector';
