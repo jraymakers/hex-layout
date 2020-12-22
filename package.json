@@ -1,6 +1,6 @@
 {
-  "name": "hexgrid",
-  "description": "TypeScript library for hexagonal grids.",
+  "name": "hex-layout",
+  "description": "TypeScript library for hexagonal layout.",
   "version": "1.0.0",
   "license": "MIT",
   "repository": {},
