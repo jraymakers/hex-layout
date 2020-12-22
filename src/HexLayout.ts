@@ -7,11 +7,13 @@ const rotation_PI_3 = Matrix.rotation(Math.PI/3);
 
 /** A Cartesian axis. */
 export enum Axis {
+
   /** The x axis. */
   X,
 
   /** The y axis. */
   Y,
+
 }
 
 /** Input settings for HexLayout. */
