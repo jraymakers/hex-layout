@@ -1,5 +1,6 @@
 export {
   Bounds,
+  MutableBounds,
 } from './Bounds';
 
 export {
@@ -11,6 +12,11 @@ export {
   Axis,
   HexLayout,
 } from './HexLayout';
+
+export {
+  Matrix,
+  MutableMatrix,
+} from './Matrix';
 
 export {
   Vector,
