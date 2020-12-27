@@ -4,7 +4,6 @@ export {
 
 export {
   Hex,
-  MutableHex,
 } from './Hex';
 
 export {

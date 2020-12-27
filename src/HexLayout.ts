@@ -135,7 +135,7 @@ export class HexLayout {
 
   /** Returns the (Cartesian) vector to the center of the given hex. */
   public centerOfHex(h: Hex): Vector {
-    const hexVector = new Vector(h.q, h.r);
+    const hexVector = h.toAxialVector();
     const notTransformedOrScaled = this.hexToPointTransform.timesVector(hexVector);
     return notTransformedOrScaled.scaledBy(this.innerRadius * 2).plus(this.origin);
   }
@@ -144,7 +144,7 @@ export class HexLayout {
   public hexFromPoint(v: Vector): Hex {
     const transformedAndScaled = v.minus(this.origin).scaledBy(1 / (this.innerRadius * 2));
     const fractionalHexVector = this.pointToHexTransform.timesVector(transformedAndScaled);
-    return Hex.mutable(fractionalHexVector.x, fractionalHexVector.y).round().frozenCopy();
+    return Hex.fromAxialVector(fractionalHexVector);
   }
 
   /**

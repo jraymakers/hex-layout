@@ -1,32 +1,38 @@
+import { Vector } from './Vector';
+
 /**
- * The coordinates of a hexagon in an abstract space.
- * A hexagon location is described by two coordinates, q and r,
- * which indicate distance along two axes at an angle of 60° (or PI/3) from each other.
- * A third coordinate, s, is derived from q and r so that all three sum to 0;
- * s is the distance along the third axis 60° from r and 120° from q.
+ * The coordinates of a hexagon.
+ * 
+ * The coordinates, q and r, are distances along two axes that are at a 60° angle.
+ * 
+ * A third coordinate, s, is derived from q and r such that q + r + s = 0.
+ * The s coordinate represents the distance along the third hexagonal axis
+ * (at 60° to both the q and r axes).
+ * 
+ * See https://www.redblobgames.com/grids/hexagons/#coordinates-axial for details.
  */
 export class Hex {
 
   /** Origin hex (0, 0). */
-  public static readonly Origin   = new Hex( 0,  0);
+  public static readonly Origin = new Hex( 0,  0);
 
   /** Hex in the positive Q direction (1, 0). */
-  public static readonly PosQ     = new Hex( 1,  0);
+  public static readonly PosQ = new Hex( 1,  0);
 
   /** Hex in the positive R direction (0, 1). */
-  public static readonly PosR     = new Hex( 0,  1);
+  public static readonly PosR = new Hex( 0,  1);
 
-  /** Hex in the positive Q, negative R direction (1, -1). */
-  public static readonly PosQNegR = new Hex( 1, -1);
+  /** Hex in the positive S direction (1, -1). */
+  public static readonly PosS = new Hex( 1, -1);
 
   /** Hex in the negative Q direction (-1, 0). */
-  public static readonly NegQ     = new Hex(-1,  0);
+  public static readonly NegQ = new Hex(-1,  0);
 
   /** Hex in the negative R direction (0, -1). */
-  public static readonly NegR     = new Hex( 0, -1);
+  public static readonly NegR = new Hex( 0, -1);
 
-  /** Hex in the negative Q, positive R direction (-1, 1). */
-  public static readonly NegQPosR = new Hex(-1,  1);
+  /** Hex in the negative S direction (-1, 1). */
+  public static readonly NegS = new Hex(-1,  1);
 
   /** 
    * All six hex directions, starting with positive Q, then positive R,
@@ -35,16 +41,18 @@ export class Hex {
   public static readonly Directions: ReadonlyArray<Hex> = [
     Hex.PosQ,
     Hex.PosR,
-    Hex.PosQNegR,
+    Hex.PosS,
     Hex.NegQ,
     Hex.NegR,
-    Hex.NegQPosR,
+    Hex.NegS,
   ];
 
   /**
    * Create a hex from a key string.
+   * 
    * The key should be string consisting of the decimal integer representations
    * of the q and r coordinates separated by an underscore.
+   * 
    * See the key() method.
    */
   public static fromKey(key: string): Hex {
@@ -52,14 +60,28 @@ export class Hex {
     return new Hex(parseInt(parts[0], 10), parseInt(parts[1], 10));
   }
 
-  /** Creates a hex from its q and r coordinates. */
-  public static create(q: number, r: number): Hex {
-    return new Hex(q, r);
-  }
-
-  /** Creates a mutable hex from its q and r coordinates. */
-  public static mutable(q: number, r: number): MutableHex {
-    return new MutableHex(q, r);
+  /**
+   * Returns the closest integer-coordinate hex to the given vector,
+   * which is interpreted to be in axial space.
+   * 
+   * See https://www.redblobgames.com/grids/hexagons/#coordinates-axial for details.
+   */
+  public static fromAxialVector(v: Vector): Hex {
+    const q = v.x;
+    const r = v.y;
+    const s = -q - r;
+    let roundQ = Math.round(q);
+    let roundR = Math.round(r);
+    const roundS = Math.round(s);
+    const qDiff = Math.abs(q - roundQ);
+    const rDiff = Math.abs(r - roundR);
+    const sDiff = Math.abs(s - roundS);
+    if (qDiff > rDiff && qDiff > sDiff) {
+      roundQ = -roundR - roundS;
+    } else if (rDiff > sDiff) {
+      roundR = -roundQ - roundS;
+    }
+    return new Hex(roundQ, roundR);
   }
 
   /** The q coordinate. */
@@ -76,7 +98,10 @@ export class Hex {
 
   /**
    * Returns the s coordinate.
-   * Derived from q and r such that all three sum to 0.
+   * 
+   * Derived from q and r such that q + r + s = 0.
+   * 
+   * See https://www.redblobgames.com/grids/hexagons/#coordinates-axial for details.
    */
   public s(): number {
     return -this.q - this.r;
@@ -84,6 +109,7 @@ export class Hex {
 
   /**
    * Returns the string key for this hex.
+   * 
    * The key consists of the decimal integer representations
    * of the q and r coordinates separated by an underscore.
    */
@@ -116,96 +142,9 @@ export class Hex {
     return new Hex(this.q - h.q, this.r - h.r);
   }
 
-  /**
-   * Returns the hex that results from scaling each coordinate by the given value or values.
-   * If one value is given, both coordinates are scaled by that value.
-   * If two values are given, each coordinate is scaled by the cooresponding value.
-   */
-  public times(q: number, r: number = q): Hex {
-    return new Hex(this.q * q, this.r * r);
-  }
-
-  /** Returns a new mutable copy of this hex. */
-  public mutableCopy(): MutableHex {
-    return new MutableHex(this.q, this.r);
-  }
-
-}
-
-/**
- * The mutable coordinates of a hexagon in an abstract space.
- * A hexagon location is described by two coordinates, q and r,
- * which indicate distance along two axes at an angle of 60° (or PI/3).
- * A third coordinate, s, is derived from q and r so that they sum to 0;
- * s is the distance along the third axis  60° from r and 120° from q.
- */
-export class MutableHex extends Hex {
-
-  /** Creates a mutable hex from its q and r coordinates. */
-  public static create(q: number, r: number): MutableHex {
-    return new MutableHex(q, r);
-  }
-
-  /** The q coordinate. */
-  public q: number;
-
-  /** The r coordinate. */
-  public r: number;
-
-  /** Construct a mutable hex from its q and r coordinates. */
-  constructor(q: number, r: number) {
-    super(q,r);
-  }
-
-  /** Updates this hex by adding the given hex, and returns the result. */
-  public add(h: Hex): MutableHex {
-    this.q += h.q;
-    this.r += h.r;
-    return this;
-  }
-
-  /** Updates this hex by subtracting the given hex, and returns the result. */
-  public sub(h: Hex): MutableHex {
-    this.q -= h.q;
-    this.r -= h.r;
-    return this;
-  }
-
-  /**
-   * Updates this hex by scaling it by the given value or values, and returns the result.
-   * If one value is given, both coordinates are scaled by that value.
-   * If two values are given, each coordinate is scaled by the cooresponding value.
-   */
-  public scale(q: number, r: number = q): MutableHex {
-    this.q *= q;
-    this.r *= r;
-    return this;
-  }
-
-  /** Updates this hex by rounding its coordinates to the nearest integer values. */
-  public round(): MutableHex {
-    let roundQ = Math.round(this.q);
-    let roundR = Math.round(this.r);
-    let roundS = Math.round(this.s());
-    const qDiff = Math.abs(this.q - roundQ);
-    const rDiff = Math.abs(this.r - roundR);
-    const sDiff = Math.abs(this.s() - roundS);
-    if (qDiff > rDiff && qDiff > sDiff) {
-      roundQ = -roundR - roundS;
-    } else if (rDiff > sDiff) {
-      roundR = -roundQ - roundS
-    }/* else {
-      roundS = -roundQ - roundR;
-    }*/
-    this.q = roundQ;
-    this.r = roundR;
-    // this.s = roundS;
-    return this;
-  }
-
-  /** Returns a frozen (immutable) copy of this hex. */
-  public frozenCopy(): Hex {
-    return new Hex(this.q, this.r/*, this.s*/);
+  /** Returns a vector, in axial space, to the center of the hex. */
+  public toAxialVector(): Vector {
+    return new Vector(this.q, this.r);
   }
 
 }
