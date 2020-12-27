@@ -8,8 +8,8 @@ export class Vector {
   public static readonly X = new Vector(1, 0);
 
   /**
-   * Unit vector in the positive t direction.
-   * Note that positive t is typically considered "down" in computer graphics.
+   * Unit vector in the positive y direction.
+   * Note that positive y is typically considered "down" in computer graphics.
    */
   public static readonly Y = new Vector(0, 1);
 
@@ -30,7 +30,7 @@ export class Vector {
     return new Vector(Math.cos(radians), Math.sin(radians));
   }
 
-  /** Creates a new mutable vector given its x and t coordinates. */
+  /** Creates a new mutable vector given its x and y coordinates. */
   public static mutable(x: number, y: number): MutableVector {
     return new MutableVector(x, y);
   }
@@ -102,11 +102,9 @@ export class MutableVector extends Vector {
   /** The y coordinate. */
   public y: number;
 
-  /** Constructs a new mutable vector given its x and t coordinates. */
+  /** Constructs a new mutable vector given its x and y coordinates. */
   constructor(x: number, y: number) {
     super(x,y);
-    // this.x = x;
-    // this.y = y;
   }
 
   /** Updates this vector by adding the given vector, and returns the result. */
