@@ -1,6 +1,5 @@
 export {
   Bounds,
-  MutableBounds,
 } from './Bounds';
 
 export {
@@ -15,10 +14,8 @@ export {
 
 export {
   Matrix,
-  MutableMatrix,
 } from './Matrix';
 
 export {
   Vector,
-  MutableVector,
 } from './Vector';

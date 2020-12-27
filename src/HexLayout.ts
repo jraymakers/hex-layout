@@ -82,7 +82,7 @@ export class HexLayout {
     const rAxisDirection = this.qAxis === Axis.X ? 1 : -1;
 
     const cornerVector0 = Matrix.rotation(rAxisDirection * Math.PI/6)
-      .timesVector(qVector).times(this.innerRadius * 2 / Math.sqrt(3));
+      .timesVector(qVector).scaledBy(this.innerRadius * 2 / Math.sqrt(3));
     const cornerVector1 = rotation_PI_3.timesVector(cornerVector0);
     const cornerVector2 = rotation_PI_3.timesVector(cornerVector1);
     const cornerVector3 = rotation_PI_3.timesVector(cornerVector2);
@@ -98,7 +98,7 @@ export class HexLayout {
       cornerVector5,
     ];
 
-    const edgeCenterVector0 = qVector.times(this.innerRadius);
+    const edgeCenterVector0 = qVector.scaledBy(this.innerRadius);
     const edgeCenterVector1 = rotation_PI_3.timesVector(edgeCenterVector0);
     const edgeCenterVector2 = rotation_PI_3.timesVector(edgeCenterVector1);
     const edgeCenterVector3 = rotation_PI_3.timesVector(edgeCenterVector2);
@@ -137,12 +137,12 @@ export class HexLayout {
   public centerOfHex(h: Hex): Vector {
     const hexVector = new Vector(h.q, h.r);
     const notTransformedOrScaled = this.hexToPointTransform.timesVector(hexVector);
-    return notTransformedOrScaled.times(this.innerRadius * 2).plus(this.origin);
+    return notTransformedOrScaled.scaledBy(this.innerRadius * 2).plus(this.origin);
   }
 
   /** Returns the hex containing the point indicated by the (Cartesian) vector. */
   public hexFromPoint(v: Vector): Hex {
-    const transformedAndScaled = v.minus(this.origin).times(1 / (this.innerRadius * 2));
+    const transformedAndScaled = v.minus(this.origin).scaledBy(1 / (this.innerRadius * 2));
     const fractionalHexVector = this.pointToHexTransform.timesVector(transformedAndScaled);
     return Hex.mutable(fractionalHexVector.x, fractionalHexVector.y).round().frozenCopy();
   }

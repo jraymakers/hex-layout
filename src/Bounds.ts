@@ -3,16 +3,6 @@ import { Vector } from './Vector';
 /** Represents a rectangular region in two-dimensional Cartesian space. */
 export class Bounds {
 
-  /** Creates a bounds given minimum and maximum values for X and Y. */
-  public static create(minX: number, minY: number, maxX: number, maxY: number): Bounds {
-    return new Bounds(minX, minY, maxX, maxY);
-  }
-
-  /** Creates a mutable bounds given minimum and maximum values for X and Y. */
-  public static mutable(minX: number, minY: number, maxX: number, maxY: number): MutableBounds {
-    return new MutableBounds(minX, minY, maxX, maxY);
-  }
-
   /** Returns the smallest bounds that contains the given vectors. */
   public static fromVectors(vecs: ReadonlyArray<Vector>): Bounds {
     let minX: number = Number.MAX_VALUE;
@@ -64,33 +54,6 @@ export class Bounds {
   /** Returns the difference between the maximum and minimum Y values. */
   public height(): number {
     return this.maxY - this.minY;
-  }
-
-}
-
-/** Represents a mutable rectangular region in two-dimensional Cartesian space. */
-export class MutableBounds extends Bounds {
-
-  /** Creates a mutable bounds given minimum and maximum values for X and Y. */
-  public static create(minX: number, minY: number, maxX: number, maxY: number): MutableBounds {
-    return new MutableBounds(minX, minY, maxX, maxY);
-  }
-
-  /** Minimum X value (i.e. "left"). */
-  public minX: number;
-
-  /** Minimum Y value (i.e. "top" when postive Y is "down"). */
-  public minY: number;
-
-  /** Maximum X value (i.e. "right"). */
-  public maxX: number;
-
-  /** Maximum Y value (i.e. "bottom" when positive Y is "down"). */
-  public maxY: number;
-
-  /** Constructs a mutable bounds given minimum and maximum values for X and Y. */
-  constructor(minX: number, minY: number, maxX: number, maxY: number) {
-    super(minX, minY, maxX, maxY);
   }
 
 }

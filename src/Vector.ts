@@ -7,10 +7,7 @@ export class Vector {
   /** Unit vector in the positive x direction. */
   public static readonly X = new Vector(1, 0);
 
-  /**
-   * Unit vector in the positive y direction.
-   * Note that positive y is typically considered "down" in computer graphics.
-   */
+  /** Unit vector in the positive y direction. */
   public static readonly Y = new Vector(0, 1);
 
   /** Unit vector at an angle of PI/6 from the x axis. */
@@ -18,21 +15,10 @@ export class Vector {
 
   /** Unit vector at an angle of PI/3 from the x axis. */
   public static readonly PI_3 = Vector.direction(Math.PI / 3);
-  
 
-  /** Creates a vector given its x and y coordinates. */
-  public static create(x: number, y: number): Vector {
-    return new Vector(x, y);
-  }
-
-  /** Creates a vector given its angle in radians from the x axis. */
+  /** Creates a unit vector given its angle in radians from the x axis. */
   public static direction(radians: number): Vector {
     return new Vector(Math.cos(radians), Math.sin(radians));
-  }
-
-  /** Creates a new mutable vector given its x and y coordinates. */
-  public static mutable(x: number, y: number): MutableVector {
-    return new MutableVector(x, y);
   }
 
   /** The x coordinate. */
@@ -73,78 +59,11 @@ export class Vector {
   }
 
   /**
-   * Returns the vector that results from scaling each coordinate by the given value or values.
-   * If one value is given, both coordinates are scaled by that value.
-   * If two values are given, each coordinate is scaled by the cooresponding value.
+   * Returns the vector that results from scaling the coordinates by the given x and y factors.
+   * If only one factor is given, it is used for both coordinates.
    */
-  public times(x: number, y: number = x): Vector {
-    return new Vector(this.x * x, this.y * y);
-  }
-
-  /** Returns a new mutable copy of this vector. */
-  public mutableCopy(): MutableVector {
-    return new MutableVector(this.x, this.y);
-  }
-
-}
-
-/** A mutable direction or point in two-dimensional Cartesian space. */
-export class MutableVector extends Vector {
-
-  /** Creates a new mutable vector given its x and y coordinates. */
-  public static create(x: number, y: number): MutableVector {
-    return new MutableVector(x, y);
-  }
-
-  /** The x coordinate. */
-  public x: number;
-
-  /** The y coordinate. */
-  public y: number;
-
-  /** Constructs a new mutable vector given its x and y coordinates. */
-  constructor(x: number, y: number) {
-    super(x,y);
-  }
-
-  /** Updates this vector by adding the given vector, and returns the result. */
-  public add(v: Vector): MutableVector {
-    this.x += v.x;
-    this.y += v.y;
-    return this;
-  }
-
-  /** Updates this vector by subtracting the given vector, and returns the result. */
-  public sub(v: Vector): MutableVector {
-    this.x -= v.x;
-    this.y -= v.y;
-    return this;
-  }
-
-  /**
-   * Updates this vector by scaling it by the given value or values, and returns the result.
-   * If one value is given, both coordinates are scaled by that value.
-   * If two values are given, each coordinate is scaled by the cooresponding value.
-   */
-  public scale(x: number, y: number = x): MutableVector {
-    this.x *= x;
-    this.y *= y;
-    return this;
-  }
-
-  /**
-   * Updates this vector by scaling each coordinate by the corresponding coordinate of the given vector,
-   * and returns the result.
-   */
-  public scaleBy(v: Vector): MutableVector {
-    this.x *= v.x;
-    this.y *= v.y;
-    return this;
-  }
-
-  /** Returns a frozen (immutable) copy of this vector. */
-  public frozenCopy(): Vector {
-    return new Vector(this.x, this.y);
+  public scaledBy(kx: number, ky: number = kx): Vector {
+    return new Vector(this.x * kx, this.y * ky);
   }
 
 }
