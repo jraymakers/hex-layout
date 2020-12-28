@@ -7,7 +7,6 @@ export {
 } from './Hex';
 
 export {
-  Axis,
   HexLayout,
 } from './HexLayout';
 
