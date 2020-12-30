@@ -1,6 +1,9 @@
+.nyc_output
 .vscode
+coverage
 node_modules
 src
 .gitignore
+.mocharc.js
 .npmignore
 tsconfig.json
