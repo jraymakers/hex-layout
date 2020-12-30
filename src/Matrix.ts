@@ -18,7 +18,12 @@ export class Matrix {
     );
   }
 
-  /** Constructs a transformation matrix representing a rotation by the specified angle in radians. */
+  /**
+   * Constructs a transformation matrix representing a rotation by the specified angle in radians.
+   * 
+   * Note that this library uses a left-handed coordinate system, in which the y axis is "down"
+   * (to match standard 2D computer graphics convention), so positive angles are clockwise, not counterclockwise.
+   */
   public static rotation(radians: number): Matrix {
     const sin = Math.sin(radians);
     const cos = Math.cos(radians);
