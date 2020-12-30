@@ -1,6 +1,6 @@
-import { Vector } from '../src';
-
 import { expect } from 'chai';
+
+import { Vector } from '../src';
 
 describe('Vector', () => {
 
@@ -10,6 +10,31 @@ describe('Vector', () => {
       const v = new Vector(1, 2);
       expect(v.x).to.equal(1);
       expect(v.y).to.equal(2);
+    });
+
+  });
+
+  describe('direction', () => {
+
+    it('return the correct vector', () => {
+      const angle = Math.PI / 3;
+      const v = Vector.direction(angle);
+      expect(v.x).to.equal(Math.cos(angle));
+      expect(v.y).to.equal(Math.sin(angle));
+    });
+
+    it('return the correct vector for zero', () => {
+      const angle = 0;
+      const v = Vector.direction(angle);
+      expect(v.x).to.equal(Math.cos(angle));
+      expect(v.y).to.equal(Math.sin(angle));
+    });
+
+    it('return the correct vector for PI/2', () => {
+      const angle = Math.PI / 2;
+      const v = Vector.direction(angle);
+      expect(v.x).to.equal(Math.cos(angle));
+      expect(v.y).to.equal(Math.sin(angle));
     });
 
   });
