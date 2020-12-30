@@ -1,15 +1,14 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "alwaysStrict": true,
     "declaration": true,
     "forceConsistentCasingInFileNames": true,
+    "lib": [ "es2015" ],
     "moduleResolution": "node",
-    "noImplicitAny": true,
     "noImplicitReturns": true,
-    "noImplicitThis": true,
     "outDir": "lib",
-    "strictNullChecks": true,
+    "strict": true,
     "target": "es5"
-  }
+  },
+  "include": [ "src" ]
 }
