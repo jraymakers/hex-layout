@@ -3,8 +3,6 @@ import { Hex } from './Hex';
 import { Matrix } from './Matrix';
 import { Vector } from './Vector';
 
-const rotation_PI_3 = Matrix.rotation(Math.PI/3);
-
 /** Input settings for HexLayout. */
 export interface HexLayoutSettings {
 
@@ -52,20 +50,22 @@ export class HexLayout {
     const rAxisOrientation = this.settings.rAxisClockwise ? 1 : -1;
 
     this.hexToPointTransform =
-      Matrix.rotation(-this.settings.qAxisAngle).timesMatrix(
+      Matrix.rotation(this.settings.qAxisAngle).timesMatrix(
         Matrix.stretch(1, rAxisOrientation * Math.sqrt(3)/2).timesMatrix(
           Matrix.xShear(0.5)
         )
       );
     this.pointToHexTransform = this.hexToPointTransform.inverse();
 
+    const oneSixthRotation = Matrix.rotation(rAxisOrientation * Math.PI/3);
+
     const cornerVector0 = Matrix.rotation(rAxisOrientation * Math.PI/6)
       .timesVector(qVector).scaledBy(this.settings.centerToCenterDistance / Math.sqrt(3));
-    const cornerVector1 = rotation_PI_3.timesVector(cornerVector0);
-    const cornerVector2 = rotation_PI_3.timesVector(cornerVector1);
-    const cornerVector3 = rotation_PI_3.timesVector(cornerVector2);
-    const cornerVector4 = rotation_PI_3.timesVector(cornerVector3);
-    const cornerVector5 = rotation_PI_3.timesVector(cornerVector4);
+    const cornerVector1 = oneSixthRotation.timesVector(cornerVector0);
+    const cornerVector2 = oneSixthRotation.timesVector(cornerVector1);
+    const cornerVector3 = oneSixthRotation.timesVector(cornerVector2);
+    const cornerVector4 = oneSixthRotation.timesVector(cornerVector3);
+    const cornerVector5 = oneSixthRotation.timesVector(cornerVector4);
 
     this.cornerVectors = [
       cornerVector0,
@@ -77,11 +77,11 @@ export class HexLayout {
     ];
 
     const edgeCenterVector0 = qVector.scaledBy(this.settings.centerToCenterDistance / 2);
-    const edgeCenterVector1 = rotation_PI_3.timesVector(edgeCenterVector0);
-    const edgeCenterVector2 = rotation_PI_3.timesVector(edgeCenterVector1);
-    const edgeCenterVector3 = rotation_PI_3.timesVector(edgeCenterVector2);
-    const edgeCenterVector4 = rotation_PI_3.timesVector(edgeCenterVector3);
-    const edgeCenterVector5 = rotation_PI_3.timesVector(edgeCenterVector4);
+    const edgeCenterVector1 = oneSixthRotation.timesVector(edgeCenterVector0);
+    const edgeCenterVector2 = oneSixthRotation.timesVector(edgeCenterVector1);
+    const edgeCenterVector3 = oneSixthRotation.timesVector(edgeCenterVector2);
+    const edgeCenterVector4 = oneSixthRotation.timesVector(edgeCenterVector3);
+    const edgeCenterVector5 = oneSixthRotation.timesVector(edgeCenterVector4);
 
     this.edgeCenterVectors = [
       edgeCenterVector0,

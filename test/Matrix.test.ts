@@ -38,11 +38,9 @@ describe('Matrix', () => {
     it('should set properties correctly', () => {
       const angle = Math.PI / 3;
       const m = Matrix.rotation(Math.PI / 3);
-      // Note that the library uses a left-handed (y-down) coordinate system,
-      // so the b and c properties are inverted.
       expect(m).to.deep.equal(new Matrix(
-         Math.cos(angle), Math.sin(angle),
-        -Math.sin(angle), Math.cos(angle),
+        Math.cos(angle), -Math.sin(angle),
+        Math.sin(angle),  Math.cos(angle),
       ));
     });
 
