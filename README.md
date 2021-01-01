@@ -25,7 +25,17 @@ const layout = new HexLayout({
   rAxisClockwise,
 });
 
-// Create 8 rows of alternating 8 and 7 seven hexes.
+// Create 8 rows of alternating 8 and 7 seven hexes:
+// *   *   *   *   *   *   *   *   --> q axis
+//   *   *   *   *   *   *   *
+// *   *   *   *   *   *   *   *
+//   *   *   *   *   *   *   *
+// *   *   *   *   *   *   *   *
+//   *   *   *   *   *   *   *
+// *   *   *   *   *   *   *   *
+//   *   *   *   *   *   *   *
+//                \
+//                 r axis
 const hexes: Hex[] = [];
 for (let r = 0; r < 8; r++) {
   for (let c = 0; c < 8 - r%2; c++) {
