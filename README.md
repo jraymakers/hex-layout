@@ -27,9 +27,9 @@ const layout = new HexLayout({
 
 // Create 8 rows of alternating 8 and 7 seven hexes:
 //
-//    0,0 hex
-//   /
-//  *   *   *   *   *   *   *   *  --  q axis
+//    0,0 hex                     7,0 hex
+//   /                           /
+//  *   *   *   *   *   *   *   *  - q axis
 //    *   *   *   *   *   *   *
 //  *   *   *   *   *   *   *   *
 //    *   *   *   *   *   *   *
@@ -37,8 +37,8 @@ const layout = new HexLayout({
 //    *   *   *   *   *   *   *
 //  *   *   *   *   *   *   *   *
 //    *   *   *   *   *   *   *
-//                 \
-//                  r axis
+//               / \
+//        0,7 hex   r axis
 //
 const hexes: Hex[] = [];
 for (let r = 0; r < 8; r++) {
