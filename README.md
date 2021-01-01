@@ -1,4 +1,4 @@
-### Hex Layout
+# Hex Layout
 
 A TypeScript library for calculating hexagonal layouts.
 
